@@ -1,7 +1,34 @@
 - hosts: all
   vars:
     ansible_python_interpreter: /usr/bin/python3
+    mysql_root_password: platypodes
   tasks:
-    - name: Debug
-      debug:
-        msg: 'Hello world'
+  - name: Install pip, MySQL
+    apt:
+      name:
+        - mysql-server
+        - python3-mysqldb
+      update_cache: yes
+      cache_valid_time: 3600
+    become: yes
+  - name: Start the MySQL service
+    become: yes
+    service:
+      name: mysql
+      state: started
+      enabled: true
+  - name: update mysql root password for all root accounts
+    become: yes
+    mysql_user:
+      name: root
+      host: "{{ item }}"
+      password: "{{ mysql_root_password }}"
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+      check_implicit_admin: yes
+      priv: "*.*:ALL,GRANT"
+    with_items:
+      - "{{ ansible_hostname }}"
+      - 127.0.0.1
+      - ::1
+      - localhost
