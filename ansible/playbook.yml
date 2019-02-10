@@ -32,3 +32,32 @@
       - 127.0.0.1
       - ::1
       - localhost
+# Todo: Grant normal user privs https://dba.stackexchange.com/questions/49803/what-are-reasonable-privileges-to-grant-typical-users
+  - name: Copy my.cnf
+    copy:
+      src: my.cnf
+      dest: /etc/mysql/mysql.conf.d/mysqld_custom.cnf
+    become: y
+  - name: Retart the MySQL service
+    become: yes
+    service:
+      name: mysql
+      state: restarted
+      enabled: true
+  - name: Enable firewall
+    ufw:
+      state: enabled
+      policy: deny
+      rule: allow
+      port: 22
+    become: y
+  - name: Open ports
+    ufw:
+      rule: allow
+      port: '{{ item }}'
+    with_items:
+      - 10000
+      - 3306
+      - 80
+      - 443
+    become: y

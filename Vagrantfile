@@ -7,6 +7,7 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/bionic64"
   config.disksize.size = "19GB"
+  config.vm.network "private_network", ip: "192.168.69.10"
 
   config.vm.provider :virtualbox do |vb|
     vb.memory = 876
